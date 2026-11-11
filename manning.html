@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kalkulator Manning</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 16px; }
+    label { display: block; margin-top: 12px; }
+    input { width: 100%; padding: 10px; font-size: 16px; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; margin-top: 16px; font-size: 16px; }
+    #hasil { margin-top: 16px; line-height: 1.8; }
+  </style>
+</head>
+<body>
+  <h1>Kalkulator Manning</h1>
+
+  <label for="b">Lebar dasar, b (m)</label>
+  <input id="b" type="number" step="any" value="2">
+
+  <label for="y">Kedalaman air, y (m)</label>
+  <input id="y" type="number" step="any" value="0.8">
+
+  <label for="n">Koefisien Manning, n</label>
+  <input id="n" type="number" step="any" value="0.015">
+
+  <label for="s">Kemiringan dasar, S (m/m)</label>
+  <input id="s" type="number" step="any" value="0.001">
+
+  <button onclick="hitung()">Hitung</button>
+
+  <svg id="sket" viewBox="0 0 240 130" style="width:100%; margin-top:16px"></svg>
+
+  <div id="hasil"></div>
+
+  <script>
+    function gambar(b, y) {
+      var W = 240, H = 130, m = 20;
+      var tinggi = y * 1.4;
+      var sk = Math.min((W - 2 * m) / b, (H - 2 * m) / tinggi);
+      var w = b * sk, h = y * sk, th = tinggi * sk;
+      var x0 = (W - w) / 2, dasar = H - m;
+
+      document.getElementById("sket").innerHTML =
+        '<rect x="' + x0 + '" y="' + (dasar - h) + '" width="' + w + '" height="' + h + '" fill="#2a8fa8" opacity="0.6"/>' +
+        '<path d="M' + x0 + ' ' + (dasar - th) + ' V' + dasar + ' H' + (x0 + w) + ' V' + (dasar - th) + '" fill="none" stroke="#333" stroke-width="3"/>' +
+        '<text x="' + (W / 2) + '" y="' + (H - 4) + '" text-anchor="middle" font-size="10">b = ' + b + ' m</text>' +
+        '<text x="' + (x0 + w + 6) + '" y="' + (dasar - h / 2) + '" font-size="10">y = ' + y + ' m</text>';
+    }
+
+    function hitung() {
+      var b = parseFloat(document.getElementById("b").value);
+      var y = parseFloat(document.getElementById("y").value);
+      var n = parseFloat(document.getElementById("n").value);
+      var s = parseFloat(document.getElementById("s").value);
+
+      if (!(b > 0 && y > 0 && n > 0 && s > 0)) {
+        document.getElementById("hasil").innerHTML = "Isi semua kolom dengan angka lebih besar dari nol.";
+        return;
+      }
+
+      var A = b * y;
+      var P = b + 2 * y;
+      var R = A / P;
+      var V = (1 / n) * Math.pow(R, 2 / 3) * Math.sqrt(s);
+      var Q = V * A;
+
+      gambar(b, y);
+
+      document.getElementById("hasil").innerHTML =
+        "Luas basah A = " + A.toFixed(3) + " m²<br>" +
+        "Keliling basah P = " + P.toFixed(3) + " m<br>" +
+        "Jari-jari hidraulik R = " + R.toFixed(3) + " m<br>" +
+        "Kecepatan V = " + V.toFixed(3) + " m/s<br>" +
+        "<b>Debit Q = " + Q.toFixed(3) + " m³/s</b>";
+    }
+  </script>
+</body>
+</html>
